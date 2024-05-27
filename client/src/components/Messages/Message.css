@@ -1,0 +1,24 @@
+.message{
+    background-color: rgb(67, 179, 67);
+    margin: 0.30rem 1rem;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+
+    display: inline-block;
+    clear: both;
+}
+
+.right{
+    float: right;
+    color: white;
+    text-align: right;
+    background-color: rgba(16, 72, 16, 0.872);
+}
+
+.left{
+    float: left;
+    text-align: left;
+    color: white;
+    background-color: rgba(66, 70, 66, 0.87);
+}
