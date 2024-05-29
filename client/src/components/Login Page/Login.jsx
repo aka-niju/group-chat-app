@@ -7,7 +7,6 @@ let user;
 const Login = () => {
   const [name, setName] = useState("");
   function sendUser(e) {
-    // e.preventDefault();
     user = name;
     setName("");
   }

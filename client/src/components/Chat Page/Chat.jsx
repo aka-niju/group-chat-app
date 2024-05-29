@@ -1,52 +1,82 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { user } from "../Login Page/Login";
 import "./Chat.css";
 import Message from "../Messages/Message";
-import ReactScrollToBottom from 'react-scroll-to-bottom'
+import ReactScrollToBottom from "react-scroll-to-bottom";
+import { io } from "socket.io-client";
 
+let socket;
 const Chat = () => {
+  const [id, setId] = useState("");
+  const [allMessages, setAllMessages] = useState([]);
   const [message, setMessage] = useState("");
-  function sendMessage(e) {
-    e.preventDefault();
 
-  }
+  const send = (e) => {
+    socket.emit("message", { message, id });
+    setMessage("");
+  };
+
+  socket = useMemo(() => io("http://localhost:4000"), []);
+
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log("User's socket id is", socket.id);
+      setId(socket.id);
+    });
+
+    socket.emit("joined", { user });
+
+    socket.on("welcome", (data) => {
+      setAllMessages((prevMessages) => [...prevMessages, data]);
+      console.log("From:", data.user, "Message is:", data.message);
+    });
+
+    socket.on("userJoined", (data) => {
+      setAllMessages((prevMessages) => [...prevMessages, data]);
+      console.log(data.user, data.message);
+    });
+
+    socket.on("leave", (data) => {
+      setAllMessages((prevMessages) => [...prevMessages, data]);
+      console.log(data.user, data.message);
+    });
+
+    return () => {
+      socket.disconnect();
+      socket.off();
+    };
+  }, []);
+
+  useEffect(() => {
+    socket.on("sendMessage", (data) => {
+      setAllMessages((prevMessages) => [...prevMessages, data]);
+      console.log(data.user, data.message, data.id);
+    });
+
+    return () => {
+      socket.off();
+    };
+  }, [allMessages]);
 
   return (
     <div className="chat-container">
       <div className="chat-panel">
         <div className="chat-navbar">
           <h1 className="chat-heading">CHAT APP</h1>
-          <button className="logout-btn">Logout</button>
+          <a href="/">
+            <button className="logout-btn">Logout</button>
+          </a>
         </div>
 
         <ReactScrollToBottom className="chat-box">
-          <Message user = {user}/>
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
-          <Message />
+          {allMessages.map((item, index) => (
+            <Message
+              key={index}
+              user={item?.id === id ? "" : item?.user}
+              message={item.message}
+              msgClass={item?.id === id ? "right" : "left"}
+            />
+          ))}
         </ReactScrollToBottom>
 
         <div className="chat-input">
@@ -58,7 +88,7 @@ const Chat = () => {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
-          <button className="send-btn" onClick={sendMessage}>
+          <button className="send-btn" onClick={send}>
             Send
           </button>
         </div>
