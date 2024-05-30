@@ -19,8 +19,8 @@ const Chat = () => {
   socket = useMemo(() => io("http://localhost:4000"), []);
 
   useEffect(() => {
+    
     socket.on("connect", () => {
-      console.log("User's socket id is", socket.id);
       setId(socket.id);
     });
 
@@ -28,17 +28,6 @@ const Chat = () => {
 
     socket.on("welcome", (data) => {
       setAllMessages((prevMessages) => [...prevMessages, data]);
-      console.log("From:", data.user, "Message is:", data.message);
-    });
-
-    socket.on("userJoined", (data) => {
-      setAllMessages((prevMessages) => [...prevMessages, data]);
-      console.log(data.user, data.message);
-    });
-
-    socket.on("leave", (data) => {
-      setAllMessages((prevMessages) => [...prevMessages, data]);
-      console.log(data.user, data.message);
     });
 
     return () => {
@@ -48,9 +37,17 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
-    socket.on("sendMessage", (data) => {
+    socket.on("leave", (data) => {
       setAllMessages((prevMessages) => [...prevMessages, data]);
-      console.log(data.user, data.message, data.id);
+    });
+
+    socket.on("userJoined", (data) => {
+      setAllMessages((prevMessages) => [...prevMessages, data]);
+    });
+
+    socket.on("sendMessage", (data) => {
+      setAllMessages((prevMessages) => [...prevMessages, data]); 
+      console.log(data.user, data.message, data.id, allMessages);
     });
 
     return () => {

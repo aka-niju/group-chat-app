@@ -6,15 +6,15 @@ const { Server } = require('socket.io');
 const port = 4000;
 const app = express();
 const users = [{}];
-const corsOptions = {
-    origin: "http://localhost:5173",
-    httpOnly: true,
-    methods: ['GET', 'POST'],
-    credentials: true,
-};
+// const corsOptions = {
+//     origin: "http://localhost:5173",
+//     httpOnly: true,
+//     methods: ['GET', 'POST'],
+//     credentials: true,
+// };
 
 // middleware and routes
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 app.get("/", (req, res, next) => {
     return res.send("<h1>Homepage from backend</h1>")
 });
@@ -30,11 +30,10 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-    console.log(`New user ${socket.id} from frontend is connected`);
+    console.log(`New user from frontend is connected`);
 
     socket.on("joined", ({ user }) => {
         users[socket.id] = user;
-        console.log(user, "from frontend has joined the chat");
 
         socket.broadcast.emit("userJoined", { user: "Admin", message: `${users[socket.id]} has joined the chat` });
 
@@ -49,8 +48,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("disconnect", () => {
-        socket.broadcast.emit("leave", { user: "Admin", message: `${users[socket.id]} has left` });
-        console.log(`${users[socket.id]} disconnected`);
+        socket.broadcast.emit("leave", { user: "Admin", message: `${users[socket.id]} has left the chat` });
     });
 })
 
