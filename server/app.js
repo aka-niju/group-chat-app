@@ -3,18 +3,18 @@ const http = require('http');
 const cors = require('cors')
 const { Server } = require('socket.io');
 
-const port = 4000;
+const port = process.env.PORT || 4000;
 const app = express();
 const users = [{}];
-// const corsOptions = {
-//     origin: "http://localhost:5173",
-//     httpOnly: true,
-//     methods: ['GET', 'POST'],
-//     credentials: true,
-// };
+const corsOptions = {
+    origin: "*",
+    httpOnly: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'],
+    credentials: true,
+};
 
 // middleware and routes
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 app.get("/", (req, res, next) => {
     return res.send("<h1>Homepage from backend</h1>")
 });
@@ -22,11 +22,7 @@ app.get("/", (req, res, next) => {
 
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: {
-        origin: "http://localhost:5173",
-        httpOnly: true,
-        credentials: true
-    }
+    cors: corsOptions
 });
 
 io.on("connection", (socket) => {
@@ -49,10 +45,11 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         socket.broadcast.emit("leave", { user: "Admin", message: `${users[socket.id]} has left the chat` });
+        console.log("User Disonnected");
     });
 })
 
 // listening to the server
 server.listen(port, () => {
-    console.log(`Server is running.. http://localhost:${port}`);
+    console.log(`Server is running`);
 })

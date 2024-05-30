@@ -19,7 +19,6 @@ const Chat = () => {
   socket = useMemo(() => io("http://localhost:4000"), []);
 
   useEffect(() => {
-    
     socket.on("connect", () => {
       setId(socket.id);
     });
@@ -46,8 +45,7 @@ const Chat = () => {
     });
 
     socket.on("sendMessage", (data) => {
-      setAllMessages((prevMessages) => [...prevMessages, data]); 
-      console.log(data.user, data.message, data.id, allMessages);
+      setAllMessages((prevMessages) => [...prevMessages, data]);
     });
 
     return () => {
@@ -60,6 +58,7 @@ const Chat = () => {
       <div className="chat-panel">
         <div className="chat-navbar">
           <h1 className="chat-heading">CHAT APP</h1>
+
           <a href="/">
             <button className="logout-btn">Logout</button>
           </a>
@@ -83,8 +82,12 @@ const Chat = () => {
             id="message"
             placeholder="enter message"
             value={message}
+            onKeyDown={(e) => {
+              e.key === "Enter" ? send() : null;
+            }}
             onChange={(e) => setMessage(e.target.value)}
           />
+
           <button className="send-btn" onClick={send}>
             Send
           </button>
