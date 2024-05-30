@@ -16,7 +16,7 @@ const Chat = () => {
     setMessage("");
   };
 
-  socket = useMemo(() => io("http://localhost:4000"), []);
+  socket = useMemo(() => io("https://group-chat-backend-15wf.onrender.com/"), []);
 
   useEffect(() => {
     socket.on("connect", () => {
